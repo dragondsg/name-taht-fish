@@ -4,37 +4,37 @@ import { FunctionalFinalScore } from "./FunctionalFinalScore";
 import { useState } from 'react';
 import { Images } from "../../assets/Images";
 
+const initialFishes = [
+  {
+    name: "trout",
+    url: Images.trout,
+  },
+  {
+    name: "salmon",
+    url: Images.salmon,
+  },
+  {
+    name: "tuna",
+    url: Images.tuna,
+  },
+  {
+    name: "shark",
+    url: Images.shark,
+  },
+];
+
 export function FunctionalApp() {
-  const [fishes, setFishes] = useState([
-    {
-      name: "trout",
-      url: Images.trout,
-    },
-    {
-      name: "salmon",
-      url: Images.salmon,
-    },
-    {
-      name: "tuna",
-      url: Images.tuna,
-    },
-    {
-      name: "shark",
-      url: Images.shark,
-    },
-  ]);
-  
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
   const [incorrectAnswersCount, setIncorrectAnswersCount] = useState(0);
   const allAnswers = {
     correctCount: correctAnswersCount,
     incorrectCount: incorrectAnswersCount,
     totalCount: correctAnswersCount + incorrectAnswersCount,
-    answersLeft: fishes.map((fish) => fish.name)
+    answersLeft: initialFishes.slice(correctAnswersCount + incorrectAnswersCount).map((fish) => fish.name)
   };
-  const playingGame = fishes.length > 0;
+  const playingGame = allAnswers.totalCount < initialFishes.length;
   
-  function incrementAnswersCount (bool: Boolean) {
+  function incrementAnswersCount (bool: boolean) {
     if (bool) {
       setCorrectAnswersCount(correctAnswersCount + 1);
     } else {
@@ -42,18 +42,13 @@ export function FunctionalApp() {
     }
   }
   
-  function removeFirstFish () {
-    setFishes(fishes.slice(1));
-  }
-  
   return (
     <>
       { playingGame && <FunctionalScoreBoard answers={allAnswers} />}
-      { playingGame && <FunctionalGameBoard inputProps={{
-        handleQuizOutput: incrementAnswersCount,
-        currentFish: fishes,
-        setFish: removeFirstFish,
-      }}/>}
+      { playingGame && <FunctionalGameBoard
+        handleQuizOutput={incrementAnswersCount}
+        currentFish={initialFishes[allAnswers.totalCount]}
+      />}
       { !playingGame && <FunctionalFinalScore answers={allAnswers} />}
     </>
   );
